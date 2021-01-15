@@ -1,6 +1,6 @@
 import { User } from "../entities/User"
 import { MyContex } from "../MyContex"
-import {Resolver, InputType, Field, Mutation, Arg, Ctx, ObjectType} from "type-graphql"
+import {Resolver, InputType, Field, Mutation, Arg, Ctx, ObjectType, Query} from "type-graphql"
 import argon from "argon2"
 
 @InputType()
@@ -36,6 +36,14 @@ export class UserResolver {
         @Arg('options') options: UsernamePasswordInput,
         @Ctx() {em}:MyContex
     ): Promise<UserResponse> {
+
+        if(options.username.length <=2){
+            return { errors:[{ field:"username",message:" Username Length must be greater than 2 "}]}
+        }
+
+        if(options.password.length <=6){
+            return { errors:[{ field:"password",message:" Password Length must be greater than 6 "}]}
+        }
         const user = await em.findOne(User, { username:options.username.toLowerCase()})
         if(user){
             return{
@@ -47,11 +55,18 @@ export class UserResolver {
         }
         const hashedPassword = await argon.hash(options.password)
         const hashedUser = em.create(User, { username:options.username.toLowerCase(),password:hashedPassword})
-        await em.persistAndFlush(hashedUser)
+        try {
+            await em.persistAndFlush(hashedUser)
+        }
+        catch(err){
+            return {
+                errors:[{ field:"",message:`${err.message}`}]
+            }
+        }
         return {
             message:`${options.username} created`,
             user:hashedUser
-    }
+        }
     }
     @Mutation(()=> UserResponse)
     async login(
@@ -67,8 +82,8 @@ export class UserResolver {
                 }]
             }
         }
-        const validy = await argon.verify(user.password, options.password);
-        if(validy){
+        const valid = await argon.verify(user.password, options.password);
+        if(!valid){
             return{
                 errors:[
                     {
@@ -79,5 +94,12 @@ export class UserResolver {
             }
         }
         return {user}
+    }
+
+    @Query(()=>[User],{nullable: true})
+    listUsers(
+        @Ctx() {em}:MyContex
+    ) : Promise<User[]>{
+        return em.find(User,{})
     }
     }
