@@ -10,8 +10,11 @@ export default {
         path: path.join(__dirname, './migrations'),
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
+        // dbName:"lubfnnat",
+        // password:"XQeOCvUrWIIqa79Osbm1LtfGn4PhOm5y",
+        // clientUrl:"postgres://lubfnnat:XQeOCvUrWIIqa79Osbm1LtfGn4PhOm5y@john.db.elephantsql.com:5432/lubfnnat",
         dbName:"lireddit",
-        password:"mysecretpassword",
+        password:"Pass2020!",
         type:"postgresql",
         debug:!__prod__,
 } as Parameters<typeof MikroORM.init>[0]

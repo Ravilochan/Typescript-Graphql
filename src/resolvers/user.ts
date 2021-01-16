@@ -34,7 +34,7 @@ export class UserResolver {
     @Mutation(()=> UserResponse)
     async register(
         @Arg('options') options: UsernamePasswordInput,
-        @Ctx() {em}:MyContex
+        @Ctx() {req,em}:MyContex
     ): Promise<UserResponse> {
 
         if(options.username.length <=2){
@@ -63,15 +63,18 @@ export class UserResolver {
                 errors:[{ field:"",message:`${err.message}`}]
             }
         }
+        // Auto Login 
+        req.session.userId = hashedUser.id
         return {
             message:`${options.username} created`,
             user:hashedUser
         }
     }
+
     @Mutation(()=> UserResponse)
     async login(
         @Arg('options') options: UsernamePasswordInput,
-        @Ctx() {em}:MyContex
+        @Ctx() {em, req }:MyContex
     ): Promise<UserResponse> {
         const user = await em.findOne(User, { username:options.username.toLowerCase()})
         if(!user){
@@ -93,6 +96,7 @@ export class UserResolver {
                 ]
             }
         }
+        req.session.userId = user.id
         return {user}
     }
 
@@ -102,4 +106,14 @@ export class UserResolver {
     ) : Promise<User[]>{
         return em.find(User,{})
     }
+
+    @Query(()=>User, {nullable:true})
+    async me(@Ctx(){req,em}:MyContex){
+     if(!req.session.userId){
+         return null;
+     }
+     const user = await em.findOne(User,{id:req.session.userId})
+     return user;
+    }
+
     }
