@@ -81,7 +81,7 @@ export class UserResolver {
             return{
                 errors: [{
                     field:"username",
-                    message:" Username doesn't exits "
+                    message:" Username doesn't exists "
                 }]
             }
         }
