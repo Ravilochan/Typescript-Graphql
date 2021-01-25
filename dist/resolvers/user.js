@@ -169,7 +169,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "listUsers", null);
 __decorate([
-    type_graphql_1.Query(() => User_1.User, { nullable: true }),
+    type_graphql_1.Query(() => User_1.User),
     __param(0, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

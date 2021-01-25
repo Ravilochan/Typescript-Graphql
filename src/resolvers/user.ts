@@ -107,7 +107,7 @@ export class UserResolver {
         return em.find(User,{})
     }
 
-    @Query(()=>User, {nullable:true})
+    @Query(()=>User)
     async me(@Ctx(){req,em}:MyContex){
      if(!req.session.userId){
          return null;

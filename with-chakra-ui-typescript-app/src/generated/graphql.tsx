@@ -20,7 +20,7 @@ export type Query = {
   posts: Array<Post>;
   post?: Maybe<Post>;
   listUsers?: Maybe<Array<User>>;
-  me?: Maybe<User>;
+  me: User;
 };
 
 
@@ -117,6 +117,17 @@ export type LoginMutation = (
   ) }
 );
 
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = (
+  { __typename?: 'Query' }
+  & { me: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'username' | 'createdAt'>
+  ) }
+);
+
 export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -156,6 +167,19 @@ export const LoginDocument = gql`
 
 export function useLoginMutation() {
   return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    username
+    createdAt
+  }
+}
+    `;
+
+export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const RegisterDocument = gql`
     mutation Register($username: String!, $password: String!) {
